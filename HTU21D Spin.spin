@@ -5,7 +5,7 @@
 
   This is a driver that uses the I2C SPIN driver v1.2 for the I2C communication.
   Sensor details and reading methodology can be found in the datasheet from
-  measurement spealties. Code was tested with the HTU21D breakout board from
+  measurement specialties. Code was tested with the HTU21D breakout board from
   Sparkfun Electronics.
 
   Use:
@@ -28,7 +28,7 @@ OBJ
   I2C  : "I2C SPIN driver v1.2"
   F    : "FloatMath"
   FS    : "FloatString"
-  PST  : "Parallax Serial Terminal"   
+  PST  : "Parallax Serial Terminal"
 
 PUB Main
   PST.Start(115200)                              ' Start the Parallax Serial Terminal cog
@@ -43,12 +43,12 @@ PUB Main
 '  SDA := sda
 
   'I2C.start(SCL,SDA)
-'  I2C.start(6,7)   
+'  I2C.start(6,7)
   'I2C.I2C_start
 '  Pause_MS(1000)
   'PST.Str(String(13,"Write Command Register"))
   'I2C.write($80,$E6,%01000000)
-  'PST.Str(String(13,"Complete")) 
+  'PST.Str(String(13,"Complete"))
 
 '  SoftReset
 '  repeat
@@ -58,7 +58,7 @@ PUB Main
 '    Pause_MS(1000)
 
 PUB SoftReset
-  PST.Str(String(13,"Writing Reset")) 
+  PST.Str(String(13,"Writing Reset"))
   I2C.command($80,$FE)
   PST.Str(String(13,"Reset Sent"))
   Pause_MS(15) 'Wait 15 mS for reset
@@ -84,7 +84,7 @@ PUB ReadHumid : humidity
    I2C.write($80,$E6,$E5)
    Pause_MS(1000)
    humidity :=  I2C.read_word($81,$E7)
-   crc := I2C.read($81,$E7) 
+   crc := I2C.read($81,$E7)
 
 
   humidity := humidity & $FFFC
