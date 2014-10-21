@@ -19,6 +19,7 @@ CON
 
 VAR
 long crc
+byte msb,lsb
 
 OBJ
   I2C  : "I2C SPIN driver v1.2"
@@ -64,9 +65,14 @@ PUB ReadTemp : T
   I2C.command($40,$E3)  'Start temperature conversion  
   PST.Str(String(13,"Done")) 
   Pause_MS(1000) 'Wait a long time for testing
+
+  msb := I2C.read_next($40)
+  lsb := I2C.read_next($40)
   
-  T :=  I2C.read_word($40,$E7)
-  crc := I2C.read($40,$E7)
+  T := (msb << 8) |  lsb
+
+  ''T :=  I2C.read($40,$E7)
+  crc := I2C.read_next($40)
 
   T := T & $FFFC
   T := F.FFloat(T)
@@ -82,9 +88,11 @@ PUB ReadHumid : humidity
   I2C.command($40,$E5)
   Pause_MS(1000)
    
-  humidity :=  I2C.read_word($40,$E7)
-  crc := I2C.read($40,$E7)
-  
+  msb := I2C.read_next($40)
+  lsb := I2C.read_next($40)
+  crc := I2C.read_next($40)
+
+  humidity := (msb << 8) |  lsb 
   humidity := humidity & $FFFC
   humidity := F.FFloat(humidity)
   humidity := F.FDiv(humidity,65536.0)
