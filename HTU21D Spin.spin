@@ -32,7 +32,7 @@ PUB Main
 
   'Startup the I2C bus
   PST.Str(String(13,"Starting the I2C Bus"))
-  Start(6,7) 
+  Start(4,5) 
   PST.Str(String(13,"Complete"))
 
   'Do a Soft Rest of the unit
@@ -48,21 +48,25 @@ PUB Start(scl,sda)
 
   SCL := scl
   SDA := sda
-
+  
   I2C.start(SCL,SDA)
   
 PUB SoftReset
   PST.Str(String(13,"Writing Reset"))
-  I2C.command($80,$FE)
+  if not \I2C.command($40,$FE)
+    PST.Str(String(13,"Abort Trap"))
   PST.Str(String(13,"Reset Sent"))
   Pause_MS(15) 'Wait 15 mS for reset per datasheet
 
 PUB ReadTemp : T
-  I2C.command($80,$F3)  'Start temperature conversion
+ 
+  PST.Str(String(13,"Writing T Convert")) 
+  I2C.command($40,$E3)  'Start temperature conversion  
+  PST.Str(String(13,"Done")) 
   Pause_MS(1000) 'Wait a long time for testing
   
-  T :=  I2C.read_word($81,$E7)
-  crc := I2C.read($81,$E7)
+  T :=  I2C.read_word($40,$E7)
+  crc := I2C.read($40,$E7)
 
   T := T & $FFFC
   T := F.FFloat(T)
@@ -75,11 +79,11 @@ PUB ReadTemp : T
 
 PUB ReadHumid : humidity
   ' Trigger No Hold Master Humidity Measurement
-  I2C.command($80,$F5)
+  I2C.command($40,$E5)
   Pause_MS(1000)
    
-  humidity :=  I2C.read_word($81,$E7)
-  crc := I2C.read($81,$E7)
+  humidity :=  I2C.read_word($40,$E7)
+  crc := I2C.read($40,$E7)
   
   humidity := humidity & $FFFC
   humidity := F.FFloat(humidity)
