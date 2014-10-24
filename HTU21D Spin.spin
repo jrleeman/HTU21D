@@ -45,7 +45,6 @@ PUB Read(TempPtr,HumidPtr)
 PRI ReadTemp : T
   ' Write temperature conversion command
   I2C.command(ADR,$E3)
-  Pause_MS(1000) 'Wait a long time for testing
 
   T := I2C.read_next(ADR)
   T := (T << 8) | I2C.read_next(ADR)
@@ -63,7 +62,6 @@ PRI ReadTemp : T
 PUB ReadHumidity : RH
   ' Trigger Humidity Measurement
   I2C.command(ADR,$E5)
-  Pause_MS(1000) 'Wait a long time for testing
 
   RH := I2C.read_next(ADR)
   RH := (RH << 8) | I2C.read_next(ADR)
