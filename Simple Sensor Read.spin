@@ -12,11 +12,11 @@ CON
 _clkmode = xtal1 + pll16x
 _xinfreq = 5_000_000
 
-  SCL = 4 'SCL Pin
-  SDA = 5 'SDA Pin                                                                                                                                                                                                                                                ' 7-bit device ID for EEPROM
+  SCL = 0 'SCL Pin
+  SDA = 1 'SDA Pin                                                                                                                                                                                                                                                ' 7-bit device ID for EEPROM
 
 VAR
-  long temperature,humidity
+  long temperature,humidity,crc
 OBJ
   PST : "Parallax Serial Terminal"
   HTU21D : "HTU21D Spin"
@@ -42,6 +42,8 @@ PUB Main
 
     PST.Str(String(13))
     PST.dec(temperature)
+    'PST.hex(temperature,4)
+    
     PST.Str(String(","))
     PST.dec(humidity)
     Pause_MS(2000)
