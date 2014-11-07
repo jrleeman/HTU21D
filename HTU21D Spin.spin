@@ -18,7 +18,7 @@ CON
   ADR = $40
 
 VAR
-byte msb,lsb,crc
+byte msb,lsb,crc,crc_calc
 
 OBJ
   I2C  : "I2C SPIN driver v1.2"
@@ -36,6 +36,25 @@ PUB SoftReset
   if \I2C.command($40,$FE)
     Pause_MS(15) 'Wait 15 mS for reset per datasheet
 
+PUB CRC8(data,crcdata,poly)| checksum,i,mask
+  i := 0
+  data := (data << 8) | crcdata
+  poly := poly << 15
+  checksum := data
+  mask := $1 << 23
+
+  repeat 16
+
+    if ((checksum & (mask>>i)) <> (mask>>i))
+      checksum := checksum ^ $0000
+
+    else
+      checksum := checksum ^ (poly >> i)
+     
+    i := i + 1
+
+  RESULT := checksum
+
 PUB Read(TempPtr,HumidPtr)
   ' Read humidity and temperature and return to
   ' passed pointers
@@ -44,11 +63,10 @@ PUB Read(TempPtr,HumidPtr)
 
 PRI ReadTemp : T
   ' Write temperature conversion command
-  I2C.command(ADR,$E3)
-
-  T := I2C.read_next(ADR)
-  T := (T << 8) | I2C.read_next(ADR)
-  crc := I2C.read_next(ADR)
+  \I2C.command(ADR,$E3)
+  T := \I2C.read_next(ADR)
+  T := (T << 8) | \I2C.read_next(ADR)
+  crc := \I2C.read_next(ADR)
 
   T := T & $FFFC
   T := F.FFloat(T)
@@ -56,16 +74,16 @@ PRI ReadTemp : T
   T := F.FMul(T,175.72)
   T := F.FSub(T,46.85)
   T := F.FMul(T,10.0) 
-  T := F.FTrunc(T) 
-  ' Add CRC Checking
+  T := F.FTrunc(T)
+
 
 PUB ReadHumidity : RH
   ' Trigger Humidity Measurement
-  I2C.command(ADR,$E5)
+  \I2C.command(ADR,$E5)
 
-  RH := I2C.read_next(ADR)
-  RH := (RH << 8) | I2C.read_next(ADR)
-  crc := I2C.read_next(ADR)
+  RH := \I2C.read_next(ADR)
+  RH := (RH << 8) | \I2C.read_next(ADR)
+  crc := \I2C.read_next(ADR)
 
   RH := RH & $FFFC
   RH := F.FFloat(RH)
@@ -74,7 +92,7 @@ PUB ReadHumidity : RH
   RH := F.FSub(RH,6.0)
   RH := F.FMul(RH,10.0)
   RH := F.FTrunc(RH)
-  ' Add CRC checking
+
 
 PUB Pause_MS(mS)
   waitcnt(clkfreq/1000 * mS + cnt)
