@@ -64,8 +64,7 @@ PUB Read(TempPtr,HumidPtr)
 PRI ReadTemp : T
   ' Write temperature conversion command
   \I2C.command(ADR,$E3)
-  T := \I2C.read_next(ADR)
-  T := (T << 8) | \I2C.read_next(ADR)
+  T := (\I2C.read_next(ADR) << 8) | \I2C.read_next(ADR)
   crc := \I2C.read_next(ADR)
 
   T := T & $FFFC
@@ -81,8 +80,7 @@ PUB ReadHumidity : RH
   ' Trigger Humidity Measurement
   \I2C.command(ADR,$E5)
 
-  RH := \I2C.read_next(ADR)
-  RH := (RH << 8) | \I2C.read_next(ADR)
+  RH := (\I2C.read_next(ADR) << 8) | \I2C.read_next(ADR)
   crc := \I2C.read_next(ADR)
 
   RH := RH & $FFFC
